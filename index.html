@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Hexagon Editor</title>
+		<meta charset="utf-8">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="css/bootstrap-colorpicker.min.css" rel="stylesheet" media="screen">
+    <link href="css/main.css" rel="stylesheet" media="screen">
+	</head>
+	<body>
+    <div class="hud">
+      <div class="cap-left"></div>
+      <div class="center"></div>
+      <div class="cap-right"></div>
+      <div class="content">
+        <div class="hexcount">0 hexagons</div>
+        <svg version="1.1" id="hexsvg" class="hexsvg pull-right color picker" height="36" width="40" data-toggle="tooltip" title="Color">
+          <polygon class="color" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+        </svg>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right remove" height="36" width="40" data-toggle="tooltip" title="Remove hexagon tool">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <polygon class="icon" points="12,20 12,16 28,16 28,20"/>
+        </svg>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right add active" height="36" width="40" data-toggle="tooltip" title="Add hexagon tool">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <polygon class="icon" points="18,10 22,10 22,16 28,16 28,20 22,20 22,26 18,26 18,20 12,20 12,16 18,16"/>
+        </svg>
+        <div class="gap pull-right"></div>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right save" height="36" width="40" data-toggle="tooltip" title="Save scene">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <text x="6" y="22" class="icon save">SAVE</text>
+        </svg>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right load" height="36" width="40" data-toggle="tooltip" title="Load a scene">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <text x="6" y="22" class="icon save">LOAD</text>
+        </svg>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right new" height="36" width="40" data-toggle="tooltip" title="Create new scene">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <text x="8" y="22" class="icon save">NEW</text>
+        </svg>
+        <div class="gap pull-right"></div>
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right info" height="36" width="40" data-toggle="tooltip" title="Info">
+          <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
+          <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
+          <polygon class="icon" points="18,10 22,10 22,13 18,13"/>
+          <polygon class="icon" points="18,15 22,15 22,26 18,26"/>
+        </svg>
+      </div>
+    </div>
+    <div class="draw" id="draw"></div>
+    
+    <div class="modal fade welcome" id="welcomeModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2>Hexagonal Tile Editor</h2>
+          </div>
+          <div class="modal-body">
+            <h3>Camera Controls</h3>
+            <p>
+              <strong>Move: </strong> W, A, S, D to move camera. R, F to move raise and lower.
+              <br/>
+              <strong>Rotate: </strong> Use the up, down, left, right arrows to rotate camera.
+              <br/>
+              <strong>Zoom: </strong> Scroll to zoom in and out.
+            </p>
+            <h3>Tools</h3>
+            <p>
+              <strong>Add hexagon: </strong> Click on the scene to add a hexagon in that location.
+              <br/>
+              <strong>Remove hexagon: </strong> Click on a hexagon to remove that hexagon from the scene.
+              <br/>
+              <strong>Color: </strong> Select the color for new hexagons.
+              <br/>
+              <strong>Save, Load, New: </strong> Save, load, or create a new scene.
+            </p>
+            <h3>Demos</h3>
+            <p>
+              <a href="#" class="demo" id="castle">Castle and Walls</a>
+              <br/>
+              <a href="#" class="demo" id="island">Island in the Sun</a>
+            </p>
+          </div>
+          <div class="modal-footer">
+            <a href="#" data-dismiss="modal">Let's Go!</a>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    
+    <div class="modal fade load" id="loadModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2>Load Scene</h2>
+          </div>
+          <div class="modal-body list">
+            <div class="row item">
+              <div class="col-md-4 how-many">68 hexagons</div>
+              <div class="col-md-6 date">December 20th 2013, 2:01 pm</div>
+              <div class="col-md-2 loadme">
+                <a href="#">Load</a>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info pull-left"><strong>Heads up! </strong>You're scenes are only being saved to your browser. If you clear your browser's settings your scenes will be deleted.</div>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="" data-dismiss="modal">Close</a>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    
+		<script src="js/vendor/three.min.js"></script>
+    <script src="js/vendor/stats.min.js"></script>
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/vendor/moment.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/vendor/bootstrap-colorpicker.min.js"></script>
+    
+    <script src="js/trippleclick.min.js"></script>
+    <script src="js/camera-controls.js"></script>
+    
+    <script src="js/demo.js"></script>
+    <script src="js/hexagon.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/main.js"></script>
+
+	</body>
+</html>

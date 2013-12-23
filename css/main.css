@@ -1,0 +1,223 @@
+html {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body {
+	margin: 0px;
+	overflow: hidden;
+}
+
+.nav {
+  border-bottom: 1px solid #ccc;
+  height: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  position: absolute;
+  width: 100%;
+  z-index: 99;
+  background: #ffffff;
+}
+
+.draw {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.collapse {
+  text-align: center;
+}
+
+.showcolor {
+  color: #E32818;
+}
+
+.hud {
+  width: 560px;
+  height: 42px;
+  display: none;
+  position: absolute;
+  margin-top: 6px;
+}
+
+.hud .content {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 999;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.hud .cap-left {
+  float: left;
+  border-right: 12px solid #fff;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  z-index: 888;
+  opacity: 0.6;
+}
+
+.hud .center {
+  float: left;
+  width: 200px;
+  height: 42px;
+  background-color: #fff;
+  z-index: 888;
+  opacity: 0.6;
+}
+
+.hud .cap-right {
+  float: left;
+  border-left: 12px solid #fff;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  z-index: 888;
+  opacity: 0.6;
+}
+
+.hexsvg {
+  margin-top:3px;
+  margin-bottom:3px;
+  margin-left:2px;
+  margin-right:2px;
+}
+
+
+/*SVG button stuff*/
+.hexsvg.button {
+  cursor: pointer;
+}
+/*REGULAR*/
+.hexsvg.button .shape {
+  fill: #fff;
+  opacity: 0.8;
+}
+.hexsvg.button .drop {
+  fill: #333;
+  opacity: 0.2;
+}
+
+.hexsvg.button .icon {
+  fill: #333333;
+  opacity: 0.4;
+}
+
+/*HOVER*/
+.hexsvg.button:hover .shape {
+  fill: #fff;
+  opacity: 1;
+}
+.hexsvg.button:hover .drop {
+  fill: #333;
+  opacity: 0.4;
+}
+
+.hexsvg.button:hover .icon {
+  fill: #333;
+  opacity: 0.4;
+}
+
+/*ACTIVE*/
+.hexsvg.button.active .shape {
+  fill: #fff;
+  opacity: 1;
+}
+.hexsvg.button.active .drop {
+  fill: #333;
+  opacity: 0.65;
+}
+
+.hexsvg.button.active .icon {
+  fill: #333;
+  opacity: 0.65;
+}
+
+/*COLOR PICKER*/
+.hexsvg.color {
+  fill: #E32818;
+  cursor: pointer;
+}
+
+.hexsvg.color .drop {
+  fill: #E32818;
+  opacity: 0.2;
+  cursor: pointer;
+}
+
+.hexsvg .icon {
+  font-size: 16px;
+  font-weight: 400;
+  font-family: Helvetica, sans-serif;
+  color: #333;
+}
+
+.hexsvg .save {
+  font-size: 10px;
+  font-weight: 400;
+  font-family: Helvetica, sans-serif;
+  color: #333;
+}
+
+.hexsvg .load {
+  font-size: 10px;
+  font-weight: 400;
+  font-family: Helvetica, sans-serif;
+  color: #333;
+}
+
+.hexsvg .new {
+  font-size: 10px;
+  font-weight: 400;
+  font-family: Helvetica, sans-serif;
+  color: #333;
+}
+
+.hexcount {
+  font-family: 'Helvetica Neue', Helvetica Neue, 'Istok Web', Helvetica, sans-serif;
+  font-size: 26px;
+  font-weight: 100;
+  position:relative;
+  top: 3px;
+  margin-left: 10px;
+  width: 120px;
+  display: inline;
+}
+
+.gap {
+  width: 12px;
+  height: 100%;
+  display: inline;
+}
+
+.modal h1, .modal h2, .modal h3, .modal h4 {
+  font-weight: 100;
+}
+
+.modal .tool-explain {
+  padding-bottom:10px;
+  display: inline;
+  width: 200px;
+  height: 20px;
+  float: left;
+}
+
+.load .date, .load .loadme {
+  font-size: 18px;
+  font-weight: 100;
+}
+
+.load .how-many {
+  font-size: 22px;
+  font-weight: 100;
+}
+
+
+
