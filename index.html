@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Hexagon Editor</title>
+		<title>Hexagonal Tile Editor</title>
 		<meta charset="utf-8">
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
     <link href="css/bootstrap-colorpicker.min.css" rel="stylesheet" media="screen">
@@ -19,12 +19,12 @@
           <polygon class="color" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
           <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
         </svg>
-        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right remove" height="36" width="40" data-toggle="tooltip" title="Remove hexagon tool">
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right remove" height="36" width="40" data-toggle="tooltip" title="Remove hexagon">
           <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
           <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
           <polygon class="icon" points="12,20 12,16 28,16 28,20"/>
         </svg>
-        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right add active" height="36" width="40" data-toggle="tooltip" title="Add hexagon tool">
+        <svg version="1.1" id="hexsvg" class="hexsvg button pull-right add active" height="36" width="40" data-toggle="tooltip" title="Add hexagon">
           <polygon class="drop" points="10,0 30,0 40,17 30,36 10,36 0,17"/>
           <polygon class="shape" points="12,3 28,3 36,17 28,33 12,33 4,17"/>
           <polygon class="icon" points="18,10 22,10 22,16 28,16 28,20 22,20 22,26 18,26 18,20 12,20 12,16 18,16"/>
@@ -92,9 +92,9 @@
           <div class="modal-footer">
             <a href="#" data-dismiss="modal">Let's Go!</a>
           </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+        </div>
+      </div>
+    </div>
     
     <div class="modal fade load" id="loadModal" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
@@ -118,9 +118,9 @@
           <div class="modal-footer">
             <a href="#" class="" data-dismiss="modal">Close</a>
           </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+        </div>
+      </div>
+    </div>
 
     
 		<script src="js/vendor/three.min.js"></script>
