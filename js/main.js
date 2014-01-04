@@ -1,30 +1,26 @@
+//Scene variables
 var camera, scene, renderer;
 var mesh, light;
 var dirLight, hemiLight;
 var controls;
-var cross;
+var delta;
 var projector, raycaster, intersects;
-
-var radius = 6371;
-var tilt = 0.41;
-var rotationSpeed = 0.6;
-
 var mouse = new THREE.Vector2(), INTERSECTED;
 var clock = new THREE.Clock();
 
-//HEXAGON CONSTANTS
+//Hexagon constants
 var SIZE = 12;
 var THICKNESS = 5;
 var HEIGHT = SIZE*2;
 var WIDTH = (Math.sqrt(3)/2) * HEIGHT;
 
-//BOARD CONTSTANTS
+//Board Constants
 var xCount = 40;
 var yCount = 40;
 var zCount = 40;
 var board;
 
-//TOOLS
+//Tools
 var TOOLS = {
   add: 0,
   remove: 1
@@ -34,15 +30,17 @@ var currentHexagonPosition = {x:0, y:0, z:0};
 var phantomHexagon;
 var hexcount = 0;
 var currentGame;
+
+//Game element to stamp out in the DOM
 var gameElement = $('.modal-body.list').html();
 
-//COLORS
+//Colors
 var COLORS = [0xFFFFFF, 0xFAFAFA, 0xF6F6F6, 0xF1F1F1, 0xEDEDED, 0xE8E8E8];
 var currentColor = 0xE32818;
 var sky = 0xBFE6FF;
 var ground = 0x333333;
 
-
+//Set the draw div to be the height of the window
 $('#draw').css('height', window.innerWidth - $('.nav').height());
 
 init();
@@ -50,6 +48,7 @@ hud();
 animate();
 firstLoad();
 
+//Places the heads up display
 function hud() {
   var hud = $('.hud');
   hud.css('left', ((window.innerWidth/2) - (hud.width()/2)));
@@ -58,9 +57,11 @@ function hud() {
 }
 
 function firstLoad() {
+  //If this is a first time user, trigger the welcome modal.
   if (localStorage.hex == undefined) {
     $('#welcomeModal').modal('toggle');
   }
+  //Find which game we'll be saving to
   for (var i = 1; i < 30; i++) {
     var name = 'game' + i;
     if (!localStorage.hasOwnProperty(name)) {
@@ -71,33 +72,37 @@ function firstLoad() {
 }
 
 function init() {
+  //WebGL detection and redirection
+  if (!Detector.webgl) {
+    window.location = "http://get.webgl.org";
+  }
 
-  //CAMERA
-	camera = new THREE.PerspectiveCamera( 39, window.innerWidth / window.innerHeight, 1, 2000 );
+  //Camera initialization
+  camera = new THREE.PerspectiveCamera( 39, window.innerWidth / window.innerHeight, 1, 2000 );
   camera.eulerOrder = "YXZ"
-	camera.position.z = 200;
+  camera.position.z = 200;
   camera.position.y = 40;
   camera.position.x = 100;
   camera.lookAt(getHexagonPositionFromLocation(Math.floor(xCount/2), 0, Math.floor(zCount/2)));
-  
-  //CONTROLS
-  controls = new THREE.FlyControls( camera );
-  controls.movementSpeed = 70;
-	controls.domElement = draw;
-	controls.rollSpeed = Math.PI / 7;
-	controls.autoForward = false;
-	controls.dragToLook = false;
 
-  //SCENE
-	scene = new THREE.Scene();
+  //Controls
+  controls = new THREE.FlyControls(camera);
+  controls.movementSpeed = 70;
+  controls.domElement = draw;
+  controls.rollSpeed = Math.PI / 7;
+  controls.autoForward = false;
+  controls.dragToLook = false;
+
+  //Scene
+  scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0xffffff, 500, 1200);
 
-  //LIGHTS
+  //Lights
   hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-	hemiLight.color.setHSL( 0.6, 1, 0.6 );
-	hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-	hemiLight.position.set( 0, 500, 0 );
-	scene.add( hemiLight );
+  hemiLight.color.setHSL( 0.6, 1, 0.6 );
+  hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+  hemiLight.position.set( 0, 500, 0 );
+  scene.add( hemiLight );
   dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
   dirLight.color.setHSL( 0.1, 1, 0.95 );
   dirLight.position.set( -1, 1.75, 1 );
@@ -116,19 +121,18 @@ function init() {
   dirLight.shadowDarkness = 0.35;
 
 
-  // GROUND
-	var ground = new THREE.Mesh(new THREE.PlaneGeometry(50000, 50000), 
-    new THREE.MeshPhongMaterial({ambient: ground, color: ground, specular: ground}) );
+  //Ground
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(50000, 50000), new THREE.MeshPhongMaterial({ambient: ground, color: ground, specular: ground}) );
   ground.name = 'ground';
   ground.rotation.x = -Math.PI/2;
-	ground.position.y = 0;
-	scene.add( ground );
-	ground.receiveShadow = true;
+  ground.position.y = 0;
+  scene.add( ground );
+  ground.receiveShadow = true;
 
-  //BOARD
+  //Board to store hexagon colors for loading, saving
   board = new Board(xCount, zCount, yCount);
-  
-  //INITIALIZING HEXAGONS
+
+  //Initializing floor hexagons
   for (var x = 0; x < board.width; x++) {
     for (var z = 0; z < board.depth; z++) {
       var hexagon = newFloorHexagon(SIZE, THICKNESS);
@@ -144,38 +148,42 @@ function init() {
     }
   }
   
-  //SELECTOR HEXAGON
+  //Phantom hexagon to act as selector for adding and removing.
   var hexagon = newHexagon(SIZE, THICKNESS);
   phantomHexagon = new THREE.Mesh(hexagon, new THREE.MeshNormalMaterial( { color: currentColor, emissive: currentColor, ambient: currentColor, transparent: true, opacity: 0 } ));
   scene.add(phantomHexagon);
   phantomHexagon.name = 'phantomHexagon';
   
-  //MOUSE INTERACTION
+  //Projector and raycaster for instersection with mouse location
   projector = new THREE.Projector();
   raycaster = new THREE.Raycaster();
   
-  //EVENT HANDLING
+  //Bind events
   bindEvents();
   
-  //RENDERING
+  //Engage the rendered
   renderer = new THREE.WebGLRenderer( { antialias: false } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	draw.appendChild( renderer.domElement );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  draw.appendChild( renderer.domElement );
   renderer.setClearColor( sky, 1 );
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
   renderer.physicallyBasedShading = true;
   renderer.shadowMapEnabled = false;
-	renderer.shadowMapCullFace = THREE.CullFaceBack;
-	document.body.appendChild( renderer.domElement );
+  renderer.shadowMapCullFace = THREE.CullFaceBack;
+  document.body.appendChild( renderer.domElement );
 }
 
+//Binding common mouse events
 function bindEvents() {
-	window.addEventListener('resize', onWindowResize, false);
+  //Handle apsect ratios when the user resizes
+  window.addEventListener('resize', onWindowResize, false);
+  //Change location of phantom hexagon on mouse move
   $('#draw').on('mousemove', onDocumentMouseMove);
+  //Handle mouse clicks
   $('#draw').on('click', onDocumentMouseClick);
   
-  //ADD HEXAGON BUTTON
+  //Select 'add hexagon' tool
   $('.button.add').on('click', function(e) {
     //remove is not active
     var button = $('.button.remove');
@@ -192,7 +200,7 @@ function bindEvents() {
     currentTool = TOOLS.add;
   });
   
-  //REMOVE HEXAGON BUTTON
+  //Select 'remove hexagon' tool
   $('.button.remove').on('click', function(e) {
     //add is not active
     var button = $('.button.add');
@@ -209,14 +217,14 @@ function bindEvents() {
     currentTool = TOOLS.remove;
   });
   
-  //SAVE SCENE
+  //Save the current scene to local storage
   $('.button.save').on('click', function(e) {
     localStorage.hex = true;
     var game = {tiles: board.getActiveTiles(), date: moment().format('MMMM Do YYYY, h:mm a')};
     localStorage[currentGame] = JSON.stringify(game);
   });
   
-  //LOAD SCENE
+  //Trigger the load modal, and populated it with saved games
   $('.button.load').on('click', function(e) {
     $('.modal-body.list').empty();
     for (var i = 1; i < 30; i++) {
@@ -240,7 +248,7 @@ function bindEvents() {
     $('#loadModal').modal('toggle');
   });
   
-  //NEW SCENE
+  //Wipe the current game, start a new localStorage game
   $('.button.new').on('click', function(e) {
     clearScene();
     resetScene();
@@ -253,11 +261,12 @@ function bindEvents() {
     }
   });
   
-  //INFO
+  //Show welcome modal for more information
   $('.button.info').on('click', function(e) {
     $('#welcomeModal').modal('show');
   });
   
+  //Load demo game
   $('.demo').on('click', function(e) {
     $('#welcomeModal').modal('hide');
     clearScene();
@@ -265,7 +274,7 @@ function bindEvents() {
     loadGame(demos[event.target.id].tiles);
   });
   
-  //ZOOM CONTROLS
+  //Bind mouse wheel for zoom/perspective control
   $("#draw").bind('mousewheel', function (e) { 
    if(e.originalEvent.wheelDelta /120 > 0) {
      if (camera.fov < 60)
@@ -277,7 +286,7 @@ function bindEvents() {
    }
   });
   
-  //Key binding
+  //Binding the enter key to add a hexagon
   $(document).on('keypress', function (event) {
     if (event.keyCode == 13) {
       switch (currentTool) {
@@ -291,7 +300,7 @@ function bindEvents() {
     }
   });
   
-  //Color picker
+  //Binding the collor picker
   $('.picker').colorpicker({color: '#0066cc'})
   .on('changeColor', function(ev) {
     currentColor = parseInt(ev.color.toHex().replace('#', '0x'));
@@ -306,13 +315,17 @@ function bindEvents() {
   });
 }
 
+//Handling mouse moves
 function onDocumentMouseMove( event ) {
+  //When the mouse is over the game, and not the color picker, hide color picker
   $('.picker').colorpicker('hide');
-	event.preventDefault();
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  event.preventDefault();
+  //Capture mouse location
+  mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 }
 
+//Routing mouse click events based on tool
 function onDocumentMouseClick() {
   switch (currentTool) {
     case TOOLS.remove:
@@ -324,6 +337,7 @@ function onDocumentMouseClick() {
   }
 }
 
+//Reset the 'floor' hexagons for a new scene
 function resetScene() {
   for (var x = 0; x < board.width; x++) {
     for (var z = 0; z < board.depth; z++) {
@@ -341,11 +355,12 @@ function resetScene() {
   }
 }
 
+//Load a saved game
 function loadGame(tiles) {
   clearScene();
   resetScene();
 
-  
+  //Add the hexagons one by one
   for (var i = 0; i < tiles.length; i++) {
     var hexagon = newHexagon(SIZE, THICKNESS);
     var mesh = new THREE.Mesh(hexagon, new THREE.MeshLambertMaterial(
@@ -362,6 +377,7 @@ function loadGame(tiles) {
   }
 }
 
+//Clears an entire scene, including the floor.
 function clearScene() {
   board = new Board(xCount, zCount, yCount);
   var removeList = [];
@@ -376,11 +392,13 @@ function clearScene() {
   updateHexcount(0);
 }
 
+//Push the hexagon count to the HUD
 function updateHexcount(number) {
   hexcount = number;
   $('.hexcount').text(hexcount + ' hexagons');
 }
 
+//Remove the selected hexagon
 function removeHexagon() {
   if ((INTERSECTED.name != 'ground' && INTERSECTED.name != 'floor') && intersects[1].object.name !== 'phantomHexagon') {
     scene.remove(intersects[1].object);
@@ -391,6 +409,7 @@ function removeHexagon() {
   }
 }
 
+//Add a hexagon at the appropriate location
 function addHexagon() {
   if (INTERSECTED.name != 'ground') {
     var hexagon = newHexagon(SIZE, THICKNESS);
@@ -409,7 +428,7 @@ function addHexagon() {
   }
 }
 
-//SELECTOR - selects hexagons
+//Places the phantomHexagon at the appropriate location, and keeps track of the foremost intersected hexagon
 function selector() {
   var mouseVector = new THREE.Vector3(mouse.x, mouse.y, 1);
   projector.unprojectVector(mouseVector, camera);
@@ -441,12 +460,14 @@ function selector() {
   }
 }
 
+//Set the phantomHexagons board location
 function setPhantomPosition(x, y, z) {
   phantomHexagon.position.x = x;
   phantomHexagon.position.y = y;
   phantomHexagon.position.z = z;
 }
 
+//Get a hexagons real-world position based upon its board location
 function getHexagonPositionFromLocation(x, y, z) {
   var position = new THREE.Vector3();
   if (z % 2 == 0) {
@@ -460,6 +481,7 @@ function getHexagonPositionFromLocation(x, y, z) {
   return position;
 }
 
+//Ensures the user doesn't fly the camera below the board, or too far in any direction.
 function checkCameraBoundries() {
   // //Y Boundries.
   if (camera.position.y < 10) {
@@ -487,21 +509,24 @@ function checkCameraBoundries() {
   }
 }
 
+//When the user resizes the window, we handle the camera's aspect ratio
 function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
+//Perform selector update, control update, camera boundry checks, and render
 function animate() {
   selector();
-	requestAnimationFrame( animate );
+  delta = clock.getDelta();
+  controls.update(delta);
+  checkCameraBoundries();
+  requestAnimationFrame(animate);
   render();
 }
 
+//Render
 function render() {
-  var delta = clock.getDelta();
-  controls.update( delta );
-  checkCameraBoundries();
-  renderer.render( scene, camera );
+  renderer.render(scene, camera);
 }
