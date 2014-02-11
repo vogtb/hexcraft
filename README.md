@@ -1,6 +1,6 @@
 # Hexcraft
 
-https://raw.github.com/vogtb/hexcraft/master/img/demo_img.png
+![alt tag](https://raw.github.com/vogtb/hexcraft/master/img/demo_img.png)
 
 Browser-based 3D hexagonal tile editor built with Three.js 
 
@@ -9,7 +9,6 @@ Browser-based 3D hexagonal tile editor built with Three.js
 Entirely front end. Open index.html in your browser and off you go! Scene saves are made to localStorage with javascript.
 
 You can try it out at http://benjvogt.com/hex
-
 
 ##Instructions
 
